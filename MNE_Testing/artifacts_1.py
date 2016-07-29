@@ -6,6 +6,7 @@ from mne.preprocessing import create_ecg_epochs, create_eog_epochs
 data_path = 'C:/Anaconda2/Lib/site-packages/examples/mne-testing-data-master'
 raw_fname = data_path + '/MEG/sample/sample_audvis_trunc_raw.fif'
 
+
 raw = mne.io.read_raw_fif(raw_fname, preload=True)
 
 

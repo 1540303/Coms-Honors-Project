@@ -8,12 +8,16 @@ from mne.datasets import somato
 #=======================================================
 #==========SET PARAMETERS===============================
 
+#WORKS WITH ANY .fif FILE!
 #@TODO replace with actual path
 data_path = somato.data_path()
 raw_fname = data_path + '/MEG/somato/sef_raw_sss.fif'
+data_path = 'C:/Anaconda2/Lib/site-packages/examples/mne-testing-data-master'
 
 # Setup for reading the raw data
 raw = mne.io.read_raw_fif(raw_fname)
+
+
 events = mne.find_events(raw, stim_channel='STI 014')
 
 # picks MEG gradiometers
