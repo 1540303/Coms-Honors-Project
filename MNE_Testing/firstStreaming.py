@@ -48,9 +48,7 @@ def drawTopo (raw):
     #standard filtering
     picks = mne.pick_types(raw.info, meg=True, exclude='bads')  
     
-    #time segment wanted
-    t_idx = raw.time_as_index([10., 20.])  
-    data, times = raw[picks, t_idx[0]:t_idx[1]] 
+
     
     
     events = mne.find_events(raw, stim_channel='STI 014')
@@ -79,8 +77,8 @@ def drawTopo (raw):
     
     #=======================================================
     #==========TOPOGRAPHICAL MAPS===========================
-    epochs.plot_psd_topomap(ch_type='grad', normalize=True)
-    
+    topomap = epochs.plot_psd_topomap(ch_type='grad', normalize=True)
+    return topomap
       
     
     
@@ -92,7 +90,7 @@ def beginStreaming (raw, raw2, interval = 0.5):
         raw2.append(toSend)
         time.sleep(interval)
 
-def beginVisualizing (raw, interval = 5, initial=20, bufferSize = 100):
+def beginVisualizing (raw, images, interval = 5, initial=20, bufferSize = 100):
     time.sleep(initial)
     while t1.is_alive():
         
@@ -105,7 +103,7 @@ def beginVisualizing (raw, interval = 5, initial=20, bufferSize = 100):
             except:
                 print "End of file..."
             try:
-                drawTopo(tempRaw)
+                images.append(drawTopo(tempRaw))
             except: 
                 x=0
         time.sleep(interval)
@@ -113,33 +111,54 @@ def beginVisualizing (raw, interval = 5, initial=20, bufferSize = 100):
 
 
      
-#WORKS WITH ANY .fif FILE!
-#@TODO replace with actual path
-data_path = somato.data_path()
-raw_fname = data_path + '/MEG/somato/sef_raw_sss.fif'
-data_path = 'C:/Anaconda2/Lib/site-packages/examples/mne-testing-data-master'
-
-# Setup for reading the raw data
-raw = mne.io.read_raw_fif(raw_fname)
-a = splitRaw(raw, 100)  
 
 
-raw=a[0]
-with suppress_stdout():
+def visualize():
+    #WORKS WITH ANY .fif FILE!
+    #@TODO replace with actual path
+    print 1
+    data_path = somato.data_path()
+    raw_fname = data_path + '/MEG/somato/sef_raw_sss.fif'
+    data_path = 'C:/Anaconda2/Lib/site-packages/examples/mne-testing-data-master'
+    
+    # Setup for reading the raw data
+    raw = mne.io.read_raw_fif(raw_fname)
+    a = splitRaw(raw, 100)  
+    
+    
+    print 2
+    global images
+    raw=a[0]
     raw2 = raw.crop(0,0)
-
-
-
-t1 = threading.Thread(target=beginStreaming, args=([raw,raw2,1]))
-t1.start()
-     
-
-with suppress_stdout():
-    t2 = threading.Thread(target=beginVisualizing, args=([raw2,1, 20, 5000]))
+    
+    
+    print 3
+    global t1
+    t1 = threading.Thread(target=beginStreaming, args=([raw,raw2,1]))
+    t1.start()
+         
+    
+    print 4
+    global t2
+    t2 = threading.Thread(target=beginVisualizing, args=([raw2, images, 1, 20, 5000]))
     t2.start()     
+    
+    print 5
+    t1.join()
+    t2.join()
+    print ("Done")
+    return images
 
 
-t1.join()
-t2.join()
-print ("Done")
+images = []
+t1 = -1
+t2 = -1
+with suppress_stdout():
+    images = visualize()    
+print ("DONE")
+
+for i in range (0, len(images)):
+    fig = images[i]
+    fig.savefig("figs/fig" + str(i) + ".png")
+    
 
