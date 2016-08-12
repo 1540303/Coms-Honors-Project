@@ -1,34 +1,22 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jul 29 13:39:21 2016
+
+@author: Axel
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
 import mne
+
+
 from mne.time_frequency import tfr_morlet, psd_multitaper
 from mne.datasets import somato
 import threading
 import time
 
-
-
 import warnings
-warnings.filterwarnings("ignore")
-
-
-
-
-from contextlib import contextmanager
-import sys, os
-
-@contextmanager
-def suppress_stdout():
-    with open(os.devnull, "w") as devnull:
-        old_stdout = sys.stdout
-        sys.stdout = devnull
-        try:  
-            yield
-        finally:
-            sys.stdout = old_stdout
-
-
+warnings.filterwarnings("error")
 
 #=======================================================
 #==========SET PARAMETERS===============================
@@ -39,9 +27,10 @@ import sys, os
 
 def splitRaw(raw, interval = 50):
     raws=[]
-    with suppress_stdout():
-        for i in range (0, int(raw._times[-1]/interval)):
-                raws.append(raw.crop(interval * i, interval * (i+1)))
+    for i in range (0, int(raw._times[-1]/interval)):
+        print "--> " + str(interval * i)
+        print "-->" + str(interval * (i+1))
+        raws.append(raw.crop(interval * i, interval * (i+1)))
     return raws
 
 def drawTopo (raw):
@@ -87,8 +76,7 @@ def drawTopo (raw):
 def beginStreaming (raw, raw2, interval = 0.5):
     for i in range (0, int(raw._times[-1])):
         #send at second intervals
-        with suppress_stdout():
-            toSend = raw.crop(i,i+1)
+        toSend = raw.crop(i,i+1)
         raw2.append(toSend)
         time.sleep(interval)
 
@@ -99,15 +87,8 @@ def beginVisualizing (raw, interval = 5, initial=20, bufferSize = 100):
         if len(raw)>bufferSize:
             firstTime = raw.times[-1*bufferSize]
             lastTime = raw.times[-1]
-        
-            try:
-                tempRaw = raw.crop(firstTime, lastTime)
-            except:
-                print "End of file..."
-            try:
-                drawTopo(tempRaw)
-            except: 
-                x=0
+            tempRaw = raw.crop(firstTime, lastTime)
+            drawTopo(tempRaw)
         time.sleep(interval)
         
 
@@ -121,25 +102,13 @@ data_path = 'C:/Anaconda2/Lib/site-packages/examples/mne-testing-data-master'
 
 # Setup for reading the raw data
 raw = mne.io.read_raw_fif(raw_fname)
-a = splitRaw(raw, 100)  
 
 
+#a = splitRaw(raw, 100)  
+try:
+    raw.crop(0,1)
+except:
+    print "AAAA"
 raw=a[0]
-with suppress_stdout():
-    raw2 = raw.crop(0,0)
 
-
-
-t1 = threading.Thread(target=beginStreaming, args=([raw,raw2,1]))
-t1.start()
-     
-
-with suppress_stdout():
-    t2 = threading.Thread(target=beginVisualizing, args=([raw2,1, 20, 5000]))
-    t2.start()     
-
-
-t1.join()
-t2.join()
-print ("Done")
 
