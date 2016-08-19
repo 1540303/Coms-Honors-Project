@@ -140,7 +140,7 @@ def visualize():
     
     print 4
     global t2
-    t2 = threading.Thread(target=beginVisualizing, args=([raw2, images, 1, 20, 5000]))
+    t2 = threading.Thread(target=beginVisualizing, args=([raw2, images, 1, 15, 3500]))
     t2.start()     
     
     print 5
@@ -154,11 +154,21 @@ images = []
 t1 = -1
 t2 = -1
 with suppress_stdout():
+    print "starting"
     images = visualize()    
 print ("DONE")
 
+names=[]
 for i in range (0, len(images)):
     fig = images[i]
-    fig.savefig("figs/fig" + str(i) + ".png")
-    
+    name = "figs/fig" + str(i) + ".png"
+    fig.savefig(name)
+    names.append(name)
+
+
+import imageio
+with imageio.get_writer('movie.gif', mode='I') as writer:
+    for filename in names:
+        image = imageio.imread(filename)
+        writer.append_data(image)
 
