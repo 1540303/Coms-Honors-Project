@@ -26,6 +26,8 @@
       <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
     </div>
     <div class="col-sm-4" style="width:60%">
+	<div id="compareVis">
+	</div>
 	<div  id='brainFrame'>
       <h3>Column 2</h3>
       <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
@@ -41,7 +43,11 @@
   <span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause
 </button>
 
-	<p><span id="seconds">00</span>:<span id="tens">00</span></p>
+	  <button type="button" id="compare" class="btn btn-default" aria-label="Left Align" onclick="">
+  <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span> Compare
+</button>
+
+	<p id='timer'><span id="seconds">00</span>:<span id="tens">00</span></p>
 </div>
     </div>
     <div class="col-sm-4" style="width:20%">
@@ -66,7 +72,7 @@ val=0;
 paused = false;
 clearInterval(Interval);
 Interval = setInterval(startTimer, 10);
-
+comparing = false;
 document.getElementById("brainFrame").innerHTML = "Hello JavaScript!";
 
 setInterval(function(){ checkForImage()}, 1000);
@@ -87,7 +93,7 @@ imageURL = './figs/fig'+val+'.png'
 if (imageExists(imageURL) && !paused)
 {
 document.getElementById("brainFrame").innerHTML = '<img src="'+imageURL+'" alt="image" style="height: 100%; width: 100%; object-fit: contain">';	
-val=val+1
+val=val+1;
 }
 
 }
@@ -98,24 +104,36 @@ val=0;
 checkForImage();
 }
 
+function compareVis(v)
+{
+v=v-1;
+imageURL = './figs/fig'+v+'.png';
+if (imageExists(imageURL))
+{
+img = '<img src="'+imageURL+'" alt="image" style="height: 100%; width: 100%; object-fit: contain">';
+time = '<p style="text-align:center;">'+document.getElementById("timer").innerHTML+'</p>';
+document.getElementById("compareVis").innerHTML = img + time;	
+}
+}
+
+function clearVis()
+{
+document.getElementById("compareVis").innerHTML = '';	
+}
 
 function pauseVis()
 {
 if (paused)
 {
 paused = false;
-//document.getElementById("pauseVis").value = "Pause";
-document.getElementById("pauseVis").innerHTML = '<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>';
 }
 else
 {
 paused = true;
-//document.getElementById("pauseVis").value = "Resume";
-document.getElementById("pauseVis2").innerHTML = '<span class="glyphicon glyphicon-play" aria-hidden="true"></span>';
 }
 }
 
-$('#pauseVis').parent().click(function () {
+$('#pauseVis').click(function () {
 if(paused)
 {
 $('#pauseVis').html('<span class="glyphicon glyphicon-play"></span> Play'); 
@@ -140,7 +158,21 @@ $('#restartVis').click(function () {
 	Interval = setInterval(startTimer, 10);
 }); 
 
+$('#compare').click(function () {
+if (!comparing)
+{
+compareVis(val);
+comparing=true;
+$('#compare').html('<span class="glyphicon glyphicon-star"></span> Compare');
+}
+else
+{
+clearVis();
+comparing = false;
+$('#compare').html('<span class="glyphicon glyphicon-star-empty"></span> Compare');
+}
 
+}); 
 
 
 
