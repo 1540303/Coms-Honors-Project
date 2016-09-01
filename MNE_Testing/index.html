@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>EEG-Vis</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="jumbotron text-center">
+  <h1>EEG Streaming Visualization</h1>
+  <p>Axel Ind</p> 
+  <p> Student Number: 1540303 </p>
+  
+</div>
+  
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4" style="width:20%">
+      <h3>Column 1</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+    </div>
+    <div class="col-sm-4" style="width:60%">
+	<div  id='brainFrame'>
+      <h3>Column 2</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+	  </div>
+	  
+	  <div class="navButtons" style="text-align:center;">
+	  <button type="button" id="restartVis" class="btn btn-default" aria-label="Left Align" onclick="restartVis();">
+  <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span> Restart
+</button>
+	
+	  <button type="button" id="pauseVis" class="btn btn-default" aria-label="Left Align" onclick="pauseVis();">
+  <span class="glyphicon glyphicon-pause" aria-hidden="true"></span> Pause
+</button>
+
+	<p><span id="seconds">00</span>:<span id="tens">00</span></p>
+</div>
+    </div>
+    <div class="col-sm-4" style="width:20%">
+      <h3>Column 3</h3>        
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+      <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+	
+
+
+
+
+
+
+	
+    </div>
+  </div>
+	
+</div>
+
+<script>
+val=0;
+paused = false;
+clearInterval(Interval);
+Interval = setInterval(startTimer, 10);
+
+document.getElementById("brainFrame").innerHTML = "Hello JavaScript!";
+
+setInterval(function(){ checkForImage()}, 1000);
+
+function imageExists(image_url){
+
+    var http = new XMLHttpRequest();
+
+    http.open('HEAD', image_url, false);
+    http.send();
+
+    return http.status != 404;
+
+}
+
+function checkForImage() {
+imageURL = './figs/fig'+val+'.png'
+if (imageExists(imageURL) && !paused)
+{
+document.getElementById("brainFrame").innerHTML = '<img src="'+imageURL+'" alt="image" style="height: 100%; width: 100%; object-fit: contain">';	
+val=val+1
+}
+
+}
+
+function restartVis()
+{
+val=0;
+checkForImage();
+}
+
+
+function pauseVis()
+{
+if (paused)
+{
+paused = false;
+//document.getElementById("pauseVis").value = "Pause";
+document.getElementById("pauseVis").innerHTML = '<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>';
+}
+else
+{
+paused = true;
+//document.getElementById("pauseVis").value = "Resume";
+document.getElementById("pauseVis2").innerHTML = '<span class="glyphicon glyphicon-play" aria-hidden="true"></span>';
+}
+}
+
+$('#pauseVis').parent().click(function () {
+if(paused)
+{
+$('#pauseVis').html('<span class="glyphicon glyphicon-play"></span> Play'); 
+clearInterval(Interval);
+	 
+}
+else
+{
+$('#pauseVis').html('<span class="glyphicon glyphicon-pause"></span> Pause');
+     clearInterval(Interval);
+     Interval = setInterval(startTimer, 10);
+
+} 
+}); 
+
+$('#restartVis').click(function () {
+    clearInterval(Interval);
+    tens = "00";
+  	seconds = "00";
+    appendTens.innerHTML = tens;
+  	appendSeconds.innerHTML = seconds;
+	Interval = setInterval(startTimer, 10);
+}); 
+
+
+
+
+
+//=========================================STOPWATCH==============================================
+
+  
+  var seconds = 00; 
+  var tens = 00; 
+  var appendTens = document.getElementById("tens")
+  var appendSeconds = document.getElementById("seconds")
+  var Interval ;
+  
+  function startTimer () {
+    tens++; 
+    
+    if(tens < 9){
+      appendTens.innerHTML = "0" + tens;
+    }
+    
+    if (tens > 9){
+      appendTens.innerHTML = tens;
+      
+    } 
+    
+    if (tens > 99) {
+      console.log("seconds");
+      seconds++;
+      appendSeconds.innerHTML = "0" + seconds;
+      tens = 0;
+      appendTens.innerHTML = "0" + 0;
+    }
+    
+    if (seconds > 9){
+      appendSeconds.innerHTML = seconds;
+    }
+  
+  }
+  
+
+
+</script>
+
+
+</body>
+</html>
