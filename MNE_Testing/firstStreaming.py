@@ -77,10 +77,13 @@ def drawTopo (raw):
     
     #=======================================================
     #==========TOPOGRAPHICAL MAPS===========================
-    topomap = epochs.plot_psd_topomap(ch_type='grad', normalize=True)
+    topomap = epochs.plot_psd_topomap(ch_type='grad', normalize=True, bands=BANDS)
     return topomap
       
-    
+def saveImage (image,value=0):
+    fig = image
+    name = "figs/fig" + str(value) + ".png"
+    fig.savefig(name)        
     
 def beginStreaming (raw, raw2, interval = 0.5):
     for i in range (0, int(raw._times[-1])):
@@ -92,6 +95,8 @@ def beginStreaming (raw, raw2, interval = 0.5):
 
 def beginVisualizing (raw, images, interval = 5, initial=20, bufferSize = 100):
     time.sleep(initial)
+    global count
+    
     while t1.is_alive():
         
         if len(raw)>bufferSize:
@@ -103,7 +108,11 @@ def beginVisualizing (raw, images, interval = 5, initial=20, bufferSize = 100):
             except:
                 print "End of file..."
             try:
-                images.append(drawTopo(tempRaw))
+                image = drawTopo(tempRaw)
+                images.append(image)
+                saveImage(image, count)
+                count = count + 1
+                
             except: 
                 x=0
         time.sleep(interval)
@@ -140,35 +149,51 @@ def visualize():
     
     print 4
     global t2
-    t2 = threading.Thread(target=beginVisualizing, args=([raw2, images, 1, 15, 3500]))
+    t2 = threading.Thread(target=beginVisualizing, args=([raw2, images, 1, 15, 5000]))
     t2.start()     
+
     
     print 5
     t1.join()
     t2.join()
+
     print ("Done")
     return images
 
+def createGif (folder='figs'):
+    with imageio.get_writer('movie.gif', mode='I') as writer:
+        for file in os.listdir("figs"):
+            if file.endswith(".png"):
+                filename = folder + "/" + str(file)
+                print filename
+                image = imageio.imread(filename)
+                writer.append_data(image)
 
+
+count=0
 images = []
 t1 = -1
 t2 = -1
+
+#16 images args=([raw2, images, 1, 15, 5000]
+BANDS = [(0, 4, 'Delta'), (4, 8, 'Theta'), (8, 12, 'Alpha'), (12, 30, 'Beta'), (30, 45, 'Gamma')]
+
+#31 images args=([raw2, images, 1, 15, 5000]
+#BANDS = [(0, 45, 'All')]
+         
+#19 images args=([raw2, images, 1, 15, 5000]
+#BANDS = [(0, 4, 'Delta'), (4, 8, 'Theta'), (8, 12, 'Alpha'), (12, 40, 'Beta')]
+         
+import time
+start_time = time.time()
+
 with suppress_stdout():
     print "starting"
     images = visualize()    
 print ("DONE")
-
-names=[]
-for i in range (0, len(images)):
-    fig = images[i]
-    name = "figs/fig" + str(i) + ".png"
-    fig.savefig(name)
-    names.append(name)
+print("--- %s seconds ---" % (time.time() - start_time))
 
 
-import imageio
-with imageio.get_writer('movie.gif', mode='I') as writer:
-    for filename in names:
-        image = imageio.imread(filename)
-        writer.append_data(image)
 
+
+createGif('figs')
