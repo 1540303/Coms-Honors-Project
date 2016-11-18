@@ -89,7 +89,7 @@ function imageExists(image_url){
 }
 
 function checkForImage() {
-imageURL = './figs/fig'+val+'.png'
+imageURL = './figs/temp/fig'+val+'.png'
 if (imageExists(imageURL) && !paused)
 {
 document.getElementById("brainFrame").innerHTML = '<img src="'+imageURL+'" alt="image" style="height: 100%; width: 100%; object-fit: contain">';	
@@ -107,7 +107,7 @@ checkForImage();
 function compareVis(v)
 {
 v=v-1;
-imageURL = './figs/fig'+v+'.png';
+imageURL = './figs/temp/fig'+v+'.png';
 if (imageExists(imageURL))
 {
 img = '<img src="'+imageURL+'" alt="image" style="height: 100%; width: 100%; object-fit: contain">';
